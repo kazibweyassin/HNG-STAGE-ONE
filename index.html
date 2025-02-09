@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Color Challenge</title>
+    <title> Color Game</title>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -199,7 +199,7 @@
 </head>
 <body>
     <div class="game-container">
-        <h1>Color Guess</h1>
+        <h1>Color Guess Game</h1>
         
         <div class="difficulty-selector">
             <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
@@ -215,7 +215,7 @@
     <!-- instruction for the game -->
     <!-- data-testid="gameInstructions -->
         <p data-testid="gameInstructions">Click on the color that matches the displayed color above.</p>
-
+        <!-- Scores -->
         <div class="scores-container">
             <div  data-testid="gamescores" class="score">
                 <span class="score-label">Score</span>
@@ -230,7 +230,7 @@
                 <span  class="score-value" id="streak">0</span>
             </div>
         </div>
-
+        <!-- Buttons -->
         <div class="game-buttons">
             <button class="game-btn" data-testid="newGameButton" id="newGameButton">New Game</button>
             <button class="game-btn" id="resetButton">Reset scores</button>
@@ -238,6 +238,7 @@
     </div>
 
     <script>
+        // colors
         const easyColors = ["red", "blue", "green", "yellow", "purple", "orange"];
         const mediumColors = [...easyColors, "pink", "brown", "gray", "cyan", "lime", "magenta"];
         const hardColors = [...mediumColors, "navy", "olive", "teal", "maroon", "indigo", "violet"];
