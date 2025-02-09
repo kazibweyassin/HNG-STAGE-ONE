@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Color Challenge</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .game-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 90%;
+            margin: 20px auto;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .difficulty-selector {
+            margin: 1rem 0;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .difficulty-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 15px;
+            background: var(--secondary-color);
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .difficulty-btn.active {
+            background: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        #colorBox {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #colorBox:hover {
+            transform: scale(1.02);
+        }
+
+        #colorOptions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .colorOption {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            text-transform: capitalize;
+        }
+
+        .colorOption:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .scores-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+        }
+
+        .score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-label {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .timer {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        .game-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .game-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
+            background: var(--accent-color);
+            transition: all 0.3s ease;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .streak-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 1rem;
+            }
+            
+            #colorBox {
+                width: 150px;
+                height: 150px;
+            }
+
+            .colorOption {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Color Guess</h1>
+        
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
+            <button class="difficulty-btn" data-difficulty="medium">Medium</button>
+            <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+        </div>
+
+        <div class="timer">Time: <span id="timeLeft">30</span>s</div>
+        
+        <div data-testid="colorBox" id="colorBox"></div>
+        <div data-testid="colorOption" id="colorOptions"></div>
+    <!-- instruction for the game -->
+        <p data-testid="gameInstructions">Click on the color that matches the displayed color above.</p>
+
+        <div class="scores-container">
+            <div class="score">
+                <span class="score-label">Score</span>
+                <span class="score-value" id="score">0</span>
+            </div>
+            <div data-testid="gamescoreus" class="score">
+                <span class="score-label">High Score</span>
+                <span class="score-value" id="highScore">0</span>
+            </div>
+            <div data-testid="score" class="score">
+                <span class="score-label">Streak</span>
+                <span  class="score-value" id="streak">0</span>
+            </div>
+        </div>
+
+        <div class="game-buttons">
+            <button class="game-btn" data-testid="newGameButton" id="newGameButton">New Game</button>
+            <button class="game-btn" id="resetButton">Reset scores</button>
+        </div>
+    </div>
+
+    <script>
+        const easyColors = ["red", "blue", "green", "yellow", "purple", "orange"];
+        const mediumColors = [...easyColors, "pink", "brown", "gray", "cyan", "lime", "magenta"];
+        const hardColors = [...mediumColors, "navy", "olive", "teal", "maroon", "indigo", "violet"];
+        
+        let currentColors = easyColors;
+        let correctColor = "";
+        let correctMessage = "Correct Color!";
+        let wrongMessage = "Wrong Color!";
+        let score = 0;
+        let highScore = localStorage.getItem('highScore') || 0;
+        let streak = 0;
+        let bestStreak = localStorage.getItem('bestStreak') || 0;
+        let timer;
+        let timeLeft = 30;
+        let gameActive = false;
+        const correctSound = new Audio("correct-6033.mp3");
+        const wrongSound = new Audio("wrong-answer-12954.mp3");
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function updatescores() {
+            document.getElementById("score").textContent = score;
+            document.getElementById("highScore").textContent = highScore;
+            document.getElementById("streak").textContent = streak;
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 30;
+            document.getElementById("timeLeft").textContent = timeLeft;
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById("timeLeft").textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            gameActive = false;
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('highScore', highScore);
+            }
+            if (streak > bestStreak) {
+                bestStreak = streak;
+                localStorage.setItem('bestStreak', bestStreak);
+            }
+            alert(`Game Over!\nFinal Score: ${score}\nBest Streak: ${bestStreak}`);
+            score = 0;
+            streak = 0;
+            updatescores();
+        }
+
+        function startGame() {
+            gameActive = true;
+            startTimer();
+            correctColor = currentColors[Math.floor(Math.random() * currentColors.length)];
+            document.getElementById("colorBox").style.backgroundColor = "#ddd";
+            document.getElementById("colorOptions").innerHTML = "";
+
+            let displayColors = [...currentColors];
+            shuffleArray(displayColors);
+            displayColors = displayColors.slice(0, 6); 
+            if (!displayColors.includes(correctColor)) {
+                
+                displayColors[0] = correctColor;
+                shuffleArray(displayColors);
+            }
+
+            displayColors.forEach(color => {
+                const button = document.createElement("button");
+                button.classList.add("colorOption");
+                button.style.backgroundColor = color;
+                button.textContent = color;
+                button.onclick = () => checkGuess(color);
+                document.getElementById("colorOptions").appendChild(button);
+            });
+
+            // Reveal color after a short delay
+            setTimeout(() => {
+                document.getElementById("colorBox").style.backgroundColor = correctColor;
+                // Hide color after 1 second on medium/hard
+                if (currentColors.length > 6) {
+                    setTimeout(() => {
+                        document.getElementById("colorBox").style.backgroundColor = "#ddd";
+                    }, 1000);
+                }
+            }, 500);
+        }
+
+        function checkGuess(selectedColor) {
+            if (!gameActive) return;
+            
+            document.getElementById("colorBox").style.backgroundColor = correctColor;
+            if (selectedColor === correctColor) {
+                score += currentColors.length > 12 ? 3 : currentColors.length > 6 ? 2 : 1;
+                streak++;
+                correctSound.play();
+                const message = document.createElement('div');
+                message.textContent = correctMessage;
+                message.style.fontSize = '1.5rem';
+                message.style.color = 'green';
+                message.style.marginBottom = '10px';
+                document.querySelector('.game-container').insertBefore(message, document.getElementById("colorBox"));
+                setTimeout(() => {
+                    message.remove();
+                }, 1000);
+                dispatchEvent(new CustomEvent('correct'));
+            
+                document.getElementById("colorBox").classList.add("pulse");
+                setTimeout(() => {
+                    document.getElementById("colorBox").classList.remove("pulse");
+                }, 500);
+            } else {
+                wrongSound.play();
+                const message = document.createElement('div');
+                message.textContent = wrongMessage;
+                message.style.fontSize = '1.5rem';
+                message.style.color = 'red';
+                message.style.marginBottom = '10px';
+                document.querySelector('.game-container').insertBefore(message, document.getElementById("colorBox"));
+                setTimeout(() => {
+                    message.remove();
+                }, 1000);
+                streak = 0;
+                timeLeft = Math.max(timeLeft - 5, 0);
+            }
+            
+            updatescores();
+            setTimeout(startGame, 1000);
+        }
+
+        // Difficulty selector
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                switch(btn.dataset.difficulty) {
+                    case 'easy':
+                        currentColors = easyColors;
+                        break;
+                    case 'medium':
+                        currentColors = mediumColors;
+                        break;
+                    case 'hard':
+                        currentColors = hardColors;
+                        break;
+                }
+                
+                startGame();
+            });
+        });
+
+        document.getElementById("newGameButton").onclick = startGame;
+        document.getElementById("resetButton").onclick = () => {
+            score = 0;
+            streak = 0;
+            highScore = 0;
+            localStorage.setItem('highScore', 0);
+            localStorage.setItem('bestStreak', 0);
+            updatescores();
+            startGame();
+        };
+
+        // Initialize game
+        updatescores();
+        startGame();
+    </script>
+</body>
+</html>
